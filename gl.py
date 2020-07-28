@@ -182,6 +182,18 @@ class Render(object):
 
 ##Please for the love of God don't use non-4 multiples for your dimensions unless you want to absoultely do you know what to your you know what.
 
+# 
+# 
+### Las funciones importantes para el LAB1 empiezan aqui
+# 
+# 
+
+### Mi idea fue revisar a todas las direcciones de un pixel si existia algun pixel distinto al color del fondo, y si para todas se cumple, pintar este pixel.
+
+### Referencias: Ninguna, la idea se me ocurrio platicando con amigos que han hecho proyectos similares y mencionaron el algoritmo "Edge" para esto
+###              No quise usarlo asi como me lo dijeron porque tampoco queria usar algo ya hecho, pero la idea de "buscar esquinas de la imagen" me parecio buena
+###              y me base en eso. 
+
 def is_encased(pixel, framebuffer,  bg_color, fb_x, fb_y):
     '''
     pixel: pixel en el que estamos
@@ -193,7 +205,7 @@ def is_encased(pixel, framebuffer,  bg_color, fb_x, fb_y):
     pixel_x = pixel[0]
     pixel_y = pixel[1]
 
-    # Para fines practicos asumimos que si el pixel esta en una orilla, tiene un pixel de color distinto hacia el lado de esa orilla
+    # Para fines practicos asumimos que si el pixel esta en una orilla, tiene un pixel de color distinto hacia el lado de esa orilla (estos son los pixel_x/y ==0 y == fb_x/y)
 
     ## Verificar a la izquierda y derecha
     if pixel_x == 0:
@@ -201,11 +213,13 @@ def is_encased(pixel, framebuffer,  bg_color, fb_x, fb_y):
     else:
         left_counter = 0
         for left in range(pixel_x):
+            ##Si por lo menos un pixel dio positivo en la prueba, pasar al siguiente paso.
             left_counter += (0 if framebuffer[pixel_y][left] == bg_color else 1)
             if left_counter > 0:
                 continue
         left_is_encased = True if left_counter > 0 else False
     
+    ##Repetimos lo mismo para todas las direcciones restantes 
     if pixel_x == fb_x:
         right_is_encased = True
     else:
@@ -231,18 +245,25 @@ def is_encased(pixel, framebuffer,  bg_color, fb_x, fb_y):
             down_counter += (0 if framebuffer[down][pixel_x] == bg_color else 1)
         down_is_encased = True if down_counter > 0 else False
 
+
+    ##Regresamos True si y solo si se cumplen las cuatro condiciones, de lo contrario saltamos al siguiente.
     if (left_is_encased and right_is_encased and down_is_encased and up_is_encased):
         return True
     else:
         return False
 
-
+## Algoritmo que utiliza el is_encased para determinar si pinta o no un pixel
 def fillpolygon(framebuffer, framebuffer_x, framebuffer_y, bg_color, render):
+    ## Utilizamos y,x porque asi definimos nuestro framebuffer
     for y in range(len(framebuffer)):
         for x in range(len(framebuffer[y])):
+            ## Verificamos para el pixel en el que estamos (y,x) si cumple la condicion de estar "encerrado"
             if is_encased((y,x),framebuffer, bg_color, framebuffer_x, framebuffer_y):
+                ## Use render.point en  lugar de render.glVertex porque al no ponerlo dentro de mi clase Render, tendria que hacer unos crazy gymmnastics para poder calcular las posiciones relativas.
+                ## Realmente no es tan dificil o loco, solo es realizar el mismo calculo que se hace en las lineas 277 - 280 de DrawPolygon
                 render.point(x,y)
 
+## Este algoritmo solo crea el outline, y despues de crearlo corre fillpolygon para poder rellenarlo. 
 def drawPolygon(filename, xdim, ydim, vertex_list, polygon=''):
     new_map = Render(xdim, ydim, xdim, ydim,0,0)
     new_map.glColor(0.65, 0.25, 0.75)
@@ -257,10 +278,12 @@ def drawPolygon(filename, xdim, ydim, vertex_list, polygon=''):
         y0 = float(v1[1]) / float(ydim)
         x1 = float(v2[0]) / float(xdim)
         y1 = float(v2[1]) / float(ydim)
+        ### El calculo de aqui arriba lo hicimos para convertir a las posiciones relativas, ya que el metodo no esta dentro del Render
         # x0 = v1[0]
         # y0 = v1[1]
         # x1 = v2[0]
         # y1 = v2[1]
+        ### Estas lineas comentadas fueron debugging para probar con posiciones absolutas, pero las deje para recordarme del problema que me dio.
         # print((x0, y0, x1, y1))
         new_map.glLine(x0, y0, x1, y1)
     fillpolygon(new_map.getFrameBufferCopy(), xdim, ydim, color(0,0,0), new_map)
