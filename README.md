@@ -5,7 +5,7 @@ Instruccion: Para el laboratorio de hoy, deben crear un algoritmo que pueda rell
 * Recomiendo correr una imagen a la vez; de lo contrario se tarda mucho en producirlas. 
 * El código es un desorden; idealmente todo deberia estar dentro de la clase Render pero mi DrawPolygon lo hice afuera desde el principio y en este momento no se me ocurre como cambiarlo para que sea mas ordenado.
 * Adjunto los BMPs que produje. 
-
+* El codigo importante esta entre las lineas 185 y 290; lo demas es lo que ya tenia de los assignments anteriores y un poco para el assignment de Models.
 ```
 Poligono 1:
 (165, 380) (185, 360) (180, 330) (207, 345) (233, 330) (230, 360) (250, 380) (220, 385) (205, 410) (193, 383)
